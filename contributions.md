@@ -1,6 +1,6 @@
 # My Contributions
 
-_Author: Aaron Roethe — generated 2026-08-26 11:17:48_
+_Author: Aaron Roethe — generated 2026-08-26 11:21:08_
 
 ---
 
@@ -14,7 +14,7 @@ _Author: Aaron Roethe — generated 2026-08-26 11:17:48_
 | grafana-telemetry | ops | 45 | 5659 | Python | 2024-07-10 | 2026-08-26 | fix(rms-integrations): fix renamed CFS runbook filename in ConductorWorkerImportRecordsCFSFailed runbook |
 | terraform-integrations | ops | 32 | 1118 | Terraform | 2022-07-11 | 2026-08-21 | Route Function App diagnostics to Event Hub, not just storage (GRU-473) (#828) |
 | tf | ops | 2 | 711 | Terraform | 2025-06-24 | 2026-08-19 | feat(azure/layer1): add appinsights topic to telemetry eventhub (GRU-474) |
-| translator | axon-productivity | 288 | 369731 | JSON | 2022-08-25 | 2026-03-30 | fix: pin tj-actions/changed-files to allowed SHA in whitespace validator |
+| translator | axon-productivity | 288 | 369731 | Liquid | 2022-08-25 | 2026-03-30 | fix: pin tj-actions/changed-files to allowed SHA in whitespace validator |
 | autodlq | axon-productivity | 276 | 167761 | Go | 2023-08-08 | 2026-08-07 | chore(deps): update module filippo.io/edwards25519 to v1.1.1 [security] (#36) (#42) |
 | integrations-auto-requeue | axon-productivity | 145 | 76052 | Go | 2026-05-05 | 2026-08-26 | docs: add ImportCallForService DLQ runbook + per-alert runbook index, group oncall docs under docs/oncall/ (#112) |
 | DBScripts | axon-productivity | 84 | 9267 | SQL | 2022-07-28 | 2026-06-24 | feat: add auto_requeue_groups and auto_requeue_transactions tables |
@@ -32,13 +32,13 @@ _Author: Aaron Roethe — generated 2026-08-26 11:17:48_
 | rms-integration-release-tools | integrations | 15 | 96 | YAML | 2025-11-21 | 2026-06-02 | feat: add integrations-auto-requeue to release branch cut workflow |
 | databridge | integrations | 7 | 3031 | Go | 2025-02-10 | 2025-02-14 | Merge branch 'main' of git.taservs.net:integrations/databridge |
 | darkwing-dotnet | integrations | 6 | 18 | YAML | 2022-08-09 | 2022-10-05 | Merged PR 2687: CincinnatiPdTraining-datastore_Records |
-| karate-api-test | rcom | 29 | 2260 | Gherkin | 2024-01-03 | 2026-08-14 | test(integrations): slim autorequeue suite to what only Karate can prove |
+| karate-api-test | rcom | 29 | 2260 | — | 2024-01-03 | 2026-08-14 | test(integrations): slim autorequeue suite to what only Karate can prove |
 | hermes | rcom | 20 | 1023 | TypeScript | 2023-08-15 | 2026-01-14 | WIP on aroethe/IbrDocument-update: f1d204cff format |
 | rms-splunk | rcom | 6 | 2991 | XML | 2026-03-17 | 2026-03-25 | docs(integrations): add Splunk 2.0 team guide |
 | infra | rcom | 2 | 4 | Python | 2024-07-15 | 2025-12-05 | ci(intgrations): remove autodlq and dbscripts from ALS release cut (#178) |
 | rms-tests | rcom | 2 | 0 | — | 2026-05-28 | 2026-05-28 | WIP on master: de83383a1 test(discovery): add incident role colors E2E test for RMS-101023 (#5086) |
 | terraform-azure-integrations | axon-iac | 46 | 8593 | Terraform | 2025-09-29 | 2026-08-17 | Add diagnostic setting for App Insights (GRU-474) |
-| axon-auto-test | axon-platform | 6 | 281 | TypeScript | 2026-03-22 | 2026-07-08 | WIP on main: 3091e4794 fix: use waitForPageWithReloads for EDP 2.0 load in DES EDP helper (#5004) |
+| axon-auto-test | axon-platform | 6 | 281 | — | 2026-03-22 | 2026-07-08 | WIP on main: 3091e4794 fix: use waitForPageWithReloads for EDP 2.0 load in DES EDP helper (#5004) |
 | AzureDataFactory | axon-pso-productivity | 3 | 58 | JSON | 2026-05-23 | 2026-05-23 | Disable trigger: PBSO-Prod-IntellitechJMSIntakeToAxonRecords-3-Minute |
 | infra-play-ground | aroethe_axoncorp | 2 | 6304 | YAML | 2026-03-12 | 2026-03-12 | build |
 | endofyearreivew | aroethe | 1 | 1385 | Shell | 2025-09-10 | 2025-09-10 | feat(init): mvp to help engineers collect github stats |

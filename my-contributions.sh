@@ -37,6 +37,7 @@ ext_to_lang() {
     sql) echo "SQL" ;;
     proto) echo "Protobuf" ;;
     feature) echo "Gherkin" ;;
+    liquid) echo "Liquid" ;;
     json) echo "JSON" ;;
     html) echo "HTML" ;;
     xml) echo "XML" ;;
@@ -72,12 +73,17 @@ for repo in "$REPOS_DIR"/*/; do
 
     # Lines changed + dominant extension, from your own commits only.
     # Binary files report "-" for add/del in --numstat and are skipped.
+    # Test/fixture files count toward lines changed but are excluded from
+    # language detection so they don't drown out actual source files.
     numstat_summary=$(git -C "$repo" log --all --author="$AUTHOR" --numstat --format='' 2>/dev/null | awk '
       $1 != "-" && $2 != "-" {
         total += $1 + $2
         file = $3
+        path_lc = tolower(file)
+        is_test = (path_lc ~ /(^|\/)(test|tests|__tests__|spec|specs|fixtures?|testdata)(\/|$)/ \
+                   || path_lc ~ /(_|\.)(test|spec)\.[a-z0-9]+$/)
         n = split(file, parts, ".")
-        if (n > 1) {
+        if (n > 1 && !is_test) {
           ext = tolower(parts[n])
           if (ext != "md" && ext != "txt" && ext != "lock" && ext != "sum" && ext != "log" && ext != "snapshot") {
             ext_lines[ext] += $1 + $2
