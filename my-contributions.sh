@@ -9,6 +9,7 @@
 set -eu
 
 CONTEXT_DIR="$(cd "$(dirname "$0")" && pwd)"
+REPOS_DIR="$(cd "$CONTEXT_DIR/.." && pwd)"
 OUTPUT="${1:-$CONTEXT_DIR/contributions.md}"
 AUTHOR="Aaron Roethe"
 TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
@@ -20,11 +21,16 @@ trap 'rm -f "$TOUCHED_FILE" "$UNTOUCHED_FILE"' EXIT
 echo "Scanning repos for commits by: $AUTHOR ..."
 echo ""
 
-for repo in "$CONTEXT_DIR"/*/repos/*/; do
+for repo in "$REPOS_DIR"/*/; do
   [[ -d "$repo/.git" ]] || continue
 
-  org=$(echo "$repo" | sed "s|$CONTEXT_DIR/||" | cut -d/ -f1)
   name=$(basename "$repo")
+  [[ "$name" == "work-history" ]] && continue
+
+  remote_url=$(git -C "$repo" remote get-url origin 2>/dev/null || echo "")
+  # git@host:org/repo.git or https://host/org/repo(.git)
+  org=$(echo "$remote_url" | sed -E 's#^git@[^:]+:##; s#^https?://[^/]+/##; s#\.git$##' | awk -F/ '{print $1}')
+  [[ -z "$org" ]] && org="unknown"
 
   commit_count=$(git -C "$repo" log --all --author="$AUTHOR" --oneline 2>/dev/null | wc -l | tr -d ' ')
 

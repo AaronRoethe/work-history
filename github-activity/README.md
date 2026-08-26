@@ -9,6 +9,7 @@ Raw export of all pull request activity from `git.taservs.net` (Axon GitHub Ente
 This folder is a research base layer — a flat, queryable record of every PR the authenticated user has authored across all orgs and repos on the enterprise GitHub instance. It is not curated or filtered. The intent is to have a single source of truth you can slice any direction: by repo, org, time period, volume of change, review activity, etc.
 
 Use it for:
+
 - Understanding which repos and orgs you've contributed to over time
 - Tracking your output (PRs merged, lines changed, review cycles)
 - Feeding into AI context or personal productivity analysis
@@ -18,10 +19,10 @@ Use it for:
 
 ## Files
 
-| File | Description |
-|---|---|
+| File            | Description                                                                                  |
+| --------------- | -------------------------------------------------------------------------------------------- |
 | `prs-raw.jsonl` | Newline-delimited JSON — one PR per line, all available fields. This is the source of truth. |
-| `prs.csv` | Flattened CSV derived from the raw file. Suitable for Excel, Google Sheets, or pandas. |
+| `prs.csv`       | Flattened CSV derived from the raw file. Suitable for Excel, Google Sheets, or pandas.       |
 
 ---
 
@@ -66,10 +67,16 @@ reviews, baseRef, headRef, url
 
 ## How to Refresh
 
-Re-run the following to regenerate both files (requires `gh` CLI authenticated to `git.taservs.net`):
+Just run `generate-work-history.sh` — it fetches from every host in its `HOSTS` list
+(`git.taservs.net` and `github.com`, using whichever account is currently active
+on each) and merges them into `prs-raw.jsonl`. Only PRs authored by the active
+account per host are pulled; a personal account you don't want included (e.g. a
+second `github.com` login) is excluded simply by not switching to it before running.
+
+To pull one host manually instead:
 
 ```bash
-# 1. Pull raw JSONL
+# 1. Pull raw JSONL (repeat per host, appending — swap GH_HOST as needed)
 GH_HOST=git.taservs.net gh api graphql --paginate \
   --jq '.data.viewer.pullRequests.nodes[]' \
   -f query='
@@ -94,7 +101,7 @@ GH_HOST=git.taservs.net gh api graphql --paginate \
       }
     }
   }' \
-  > prs-raw.jsonl
+  >> prs-raw.jsonl
 
 # 2. Derive CSV from raw
 jq -r '

@@ -47,10 +47,25 @@ AUTHOR_NAME="$(git config --global user.name 2>/dev/null || echo 'Unknown')"
 AUTHOR_EMAIL="$(git config --global user.email 2>/dev/null || echo 'unknown@example.com')"
 
 # ── Re-fetch latest PR data ───────────────────────────────────────────────────
+#
+# Pulls from every GitHub host/account you want tracked. Only fetches PRs
+# authored by the currently-active account on each host — to exclude an
+# account (e.g. a personal one), just don't add it here; there's no need
+# to filter results after the fact.
 
-if [[ "$SKIP_FETCH" == false ]]; then
-  echo "→ Fetching latest PRs from git.taservs.net..."
-  GH_HOST=git.taservs.net gh api graphql --paginate \
+HOSTS=(git.taservs.net github.com)
+
+fetch_host_prs() {
+  local host="$1" out="$2"
+  # GH_HOST is only meaningful for Enterprise hosts; setting it to
+  # github.com itself makes gh hit the wrong API endpoint, so leave it
+  # unset for the default host and only export it for Enterprise hosts.
+  if [[ "$host" != "github.com" ]]; then
+    export GH_HOST="$host"
+  else
+    unset GH_HOST || true
+  fi
+  gh api graphql --paginate \
     --jq '.data.viewer.pullRequests.nodes[]' \
     -f query='
     query($endCursor: String) {
@@ -73,8 +88,21 @@ if [[ "$SKIP_FETCH" == false ]]; then
           }
         }
       }
-    }' > "$JSONL"
-  echo "  fetched $(jq -s 'length' "$JSONL") PRs"
+    }' > "$out"
+}
+
+if [[ "$SKIP_FETCH" == false ]]; then
+  : > "$JSONL"
+  for host in "${HOSTS[@]}"; do
+    echo "→ Fetching latest PRs from $host..."
+    HOST_TMP=$(mktemp)
+    fetch_host_prs "$host" "$HOST_TMP"
+    echo "  fetched $(jq -s 'length' "$HOST_TMP") PRs"
+    cat "$HOST_TMP" >> "$JSONL"
+    rm -f "$HOST_TMP"
+  done
+  echo ""
+  echo "  total: $(jq -s 'length' "$JSONL") PRs across ${#HOSTS[@]} host(s)"
   echo ""
 fi
 
