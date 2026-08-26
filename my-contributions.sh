@@ -15,8 +15,7 @@ AUTHOR="Aaron Roethe"
 TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
 
 TOUCHED_FILE=$(mktemp)
-UNTOUCHED_FILE=$(mktemp)
-trap 'rm -f "$TOUCHED_FILE" "$UNTOUCHED_FILE"' EXIT
+trap 'rm -f "$TOUCHED_FILE"' EXIT
 
 echo "Scanning repos for commits by: $AUTHOR ..."
 echo ""
@@ -40,13 +39,10 @@ for repo in "$REPOS_DIR"/*/; do
     last_msg=$(git -C "$repo" log --all --author="$AUTHOR" --format="%s" 2>/dev/null | head -1)
     echo "${last_date}|${org}|${name}|${commit_count}|${first_date}|${last_msg}" >> "$TOUCHED_FILE"
     echo "  ✓ $org/$name ($commit_count commits)"
-  else
-    echo "${org}|${name}" >> "$UNTOUCHED_FILE"
   fi
 done
 
 touched_count=$(wc -l < "$TOUCHED_FILE" | tr -d ' ')
-untouched_count=$(wc -l < "$UNTOUCHED_FILE" | tr -d ' ')
 
 echo ""
 echo "Writing report to: $OUTPUT"
@@ -69,7 +65,15 @@ echo "Writing report to: $OUTPUT"
     echo "| Repo | Org | Commits | First commit | Last commit | Last message |"
     echo "|------|-----|---------|--------------|-------------|--------------|"
 
-    sort -r "$TOUCHED_FILE" | while IFS='|' read -r last_date org name count first_date last_msg; do
+    # Order orgs by total commits across all their repos (largest bucket
+    # first), then repos within an org by commit count descending.
+    awk -F'|' '
+      FNR==NR { total[$2] += $4; next }
+      { printf "%012d|%s\n", total[$2], $0 }
+    ' "$TOUCHED_FILE" "$TOUCHED_FILE" \
+      | sort -t'|' -k1,1nr -k5,5nr \
+      | cut -d'|' -f2- \
+      | while IFS='|' read -r last_date org name count first_date last_msg; do
       summary_link="$org/${name}.md"
       if [[ -f "$CONTEXT_DIR/$summary_link" ]]; then
         echo "| [$name]($summary_link) | $org | $count | $first_date | $last_date | $last_msg |"
@@ -79,35 +83,7 @@ echo "Writing report to: $OUTPUT"
     done
   fi
 
-  echo ""
-  echo "---"
-  echo ""
-
-  # ── Repos I've never touched ─────────────────────────────────────────────────
-  echo "## Repos I've never committed to ($untouched_count)"
-  echo ""
-
-  if [[ "$untouched_count" -eq 0 ]]; then
-    echo "_All repos have your commits._"
-  else
-    prev_org=""
-    sort "$UNTOUCHED_FILE" | while IFS='|' read -r org name; do
-      if [[ "$org" != "$prev_org" ]]; then
-        [[ -n "$prev_org" ]] && echo ""
-        echo "### $org"
-        echo ""
-        prev_org="$org"
-      fi
-      summary_link="$org/${name}.md"
-      if [[ -f "$CONTEXT_DIR/$summary_link" ]]; then
-        echo "- [$name]($summary_link)"
-      else
-        echo "- $name"
-      fi
-    done
-  fi
-
 } > "$OUTPUT"
 
-echo "Done. $touched_count repos touched, $untouched_count never touched."
+echo "Done. $touched_count repos touched."
 echo "  Report: $OUTPUT"
